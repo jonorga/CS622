@@ -9,6 +9,11 @@ public class GameObject {
 		this.yPosition = yPosition;
 	}
 	
+	public void setCoordinates(int xPosition, int yPosition) {
+		this.xPosition = xPosition;
+		this.yPosition = yPosition;
+	}
+	
 	@Override
 	public String toString() {
 		return "GameObject";
