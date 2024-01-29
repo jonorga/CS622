@@ -14,6 +14,10 @@ public class GameObject {
 		this.yPosition = yPosition;
 	}
 	
+	public void destroySelf() {
+		
+	}
+	
 	@Override
 	public String toString() {
 		return "GameObject";
