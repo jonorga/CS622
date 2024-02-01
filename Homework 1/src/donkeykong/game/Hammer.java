@@ -9,7 +9,7 @@
 
 package donkeykong.game;
 
-public class Hammer extends GameObject{
+public class Hammer extends GameObject {
 	private boolean inUse;
 	private int lifeSpan;
 	
