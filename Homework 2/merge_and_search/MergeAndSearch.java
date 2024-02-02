@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.io.File;
 
 public class MergeAndSearch {
-
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		MergeAndSearch t = new MergeAndSearch();
+		t.Merge();
+	}
+
+	public void Merge() {
 		String currentPath = "None found";
 		try {
 			currentPath = new java.io.File(".").getCanonicalPath();
@@ -15,8 +19,7 @@ public class MergeAndSearch {
 				System.out.println(fileEntry);
 			}
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		}
 	}
-
 }

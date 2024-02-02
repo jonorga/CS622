@@ -3,11 +3,11 @@ package donkeykong.game;
 public class TestGameRun {
 
 	public static void main(String[] args) {
-		boolean playerMovementExample = false;
+		boolean playerMovementExample = true;
 		boolean enemyThrowsBarrelExample = false;
 		boolean playerCanLoseExample = false;
 		boolean playerGetsPointsExample = false;
-		boolean playerCanWinExample = true;
+		boolean playerCanWinExample = false;
 		
 		System.out.println("Test Game Run Started...");
 		GameManager gameManager = new GameManager();
