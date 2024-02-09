@@ -95,12 +95,4 @@ public class FindFiles {
 	public int getFoundFilesSize() {
 		return dataFilePaths.size();
 	}
-	
-	/**
-     * This method returns the current working path
-     * @return String
-     */
-	public String getCurrentPath() {
-		return currentPath;
-	}
 }
