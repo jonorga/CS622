@@ -1,6 +1,7 @@
 package genome;
 
 import java.util.concurrent.FutureTask;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
@@ -8,54 +9,23 @@ import java.util.concurrent.ExecutorService;
 public class ThreadRunner {
 
 	public static void main(String[] args) {
-		threadPool();
-		
-		
-//		GenomeBuilder gb = new GenomeBuilder();
-//		FutureTask<String> future = new FutureTask<String>(gb);
-//		ExecutorService threadPool = Executors.newCachedThreadPool();
-//		threadPool.execute(future);
-		
-//		Thread thread = new Thread(future);
-//		thread.start();
-//		try
-//		{
-//			System.out.println(future.get());
-//		} catch (ExecutionException | InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		threadPool.shutdown();
-	}
-
-	public static void noThreads(int bound) {
-		long startTime = System.nanoTime();
-		
-		for (int i = 0; i < bound; i++) {
-			GenomeBuilder genomeBuilder = new GenomeBuilder();
-			genomeBuilder.call();
-		}
-		
-		long endTime = System.nanoTime() - startTime;
-		System.out.println("Generating " + bound + " genome sequences with no threads completed in "
-				+ endTime + " nanoseconds. " + (endTime / 1000000) + " (milliseconds)");
+		noThreads(1000);
+//		threadPool(5, 20000);
+//		threadNoPools(5, 20000);
+//		threadNoLists(200);
 	}
 	
-	public static void threadPool() {
+	public static void threadNoLists(int runCount) {
 		long startTime = System.nanoTime();
+		ExecutorService threadPool = Executors.newFixedThreadPool(5);
 		
-
-		GenomeBuilder[] genomeBuilder = new GenomeBuilder[5];
-		for (int i = 0; i < 5; i++) {
-			genomeBuilder[i] = new GenomeBuilder();
-		}
-		
-		ExecutorService threadPool = Executors.newCachedThreadPool();
-		for (int i = 0; i < 20; i++) {
-			FutureTask<String> future1 = new FutureTask<String>(genomeBuilder[0]);
-			FutureTask<String> future2 = new FutureTask<String>(genomeBuilder[1]);
-			FutureTask<String> future3 = new FutureTask<String>(genomeBuilder[2]);
-			FutureTask<String> future4 = new FutureTask<String>(genomeBuilder[3]);
-			FutureTask<String> future5 = new FutureTask<String>(genomeBuilder[4]);
+			
+		for (int i = 0; i < runCount; i++) {
+			FutureTask<String> future1 = new FutureTask<String>(new GenomeBuilder());
+			FutureTask<String> future2 = new FutureTask<String>(new GenomeBuilder());
+			FutureTask<String> future3 = new FutureTask<String>(new GenomeBuilder());
+			FutureTask<String> future4 = new FutureTask<String>(new GenomeBuilder());
+			FutureTask<String> future5 = new FutureTask<String>(new GenomeBuilder());
 			
 			threadPool.execute(future1);
 			threadPool.execute(future2);
@@ -74,10 +44,84 @@ public class ThreadRunner {
 				e.printStackTrace();
 			}
 		}
+		
+		long endTime = System.nanoTime() - startTime;
+		System.out.println("Generating " + (runCount * 5) + " genome sequences with thread pool (no lists) completed in "
+				+ endTime + " nanoseconds. " + (endTime / 1000000) + " (milliseconds)");
+	}
+	
+	public static void threadNoPools(int threadCount, int runCount) {
+		long startTime = System.nanoTime();
+		
+		ArrayList<FutureTask<String>> futures = new ArrayList<FutureTask<String>>();
+		for (int i = 0; i < runCount; i++) {
+			for (int j = 0; j < threadCount; j++) {
+				futures.add(new FutureTask<String>(new GenomeBuilder()));
+			}
+			
+			for (int j = 0; j < threadCount; j++) {
+				Thread thread = new Thread(futures.get(j));
+				thread.start();
+			}
+			
+			try
+			{
+				for (int j = 0; j < threadCount; j++) {
+					futures.get(j).get();
+				}
+			} catch (ExecutionException | InterruptedException e) {
+				e.printStackTrace();
+			}
+			futures.clear();
+		}
+		
+		long endTime = System.nanoTime() - startTime;
+		System.out.println("Generating " + (runCount * threadCount) + " genome sequences with threads (no pool) completed in "
+				+ endTime + " nanoseconds. " + (endTime / 1000000) + " (milliseconds)");
+	}
+
+	public static void noThreads(int runCount) {
+		long startTime = System.nanoTime();
+		GenomeBuilder genomeBuilder;
+		for (int i = 0; i < runCount; i++) {
+			genomeBuilder = new GenomeBuilder();
+			genomeBuilder.call();
+		}
+		
+		long endTime = System.nanoTime() - startTime;
+		System.out.println("Generating " + runCount + " genome sequences with no threads completed in "
+				+ endTime + " nanoseconds. " + (endTime / 1000000) + " (milliseconds)");
+	}
+	
+	public static void threadPool(int threadCount, int runCount) {
+		long startTime = System.nanoTime();
+		
+		ExecutorService threadPool = Executors.newCachedThreadPool();
+		
+		ArrayList<FutureTask<String>> futures = new ArrayList<FutureTask<String>>();
+		for (int i = 0; i < runCount; i++) {
+			for (int j = 0; j < threadCount; j++) {
+				futures.add(new FutureTask<String>(new GenomeBuilder()));
+			}
+			
+			for (int j = 0; j < threadCount; j++) {
+				threadPool.execute(futures.get(j));
+			}
+			
+			try
+			{
+				for (int j = 0; j < threadCount; j++) {
+					futures.get(j).get();
+				}
+			} catch (ExecutionException | InterruptedException e) {
+				e.printStackTrace();
+			}
+			futures.clear();
+		}
 		threadPool.shutdown();
 		
 		long endTime = System.nanoTime() - startTime;
-		System.out.println("Generating 100 genome sequences with no threads completed in "
+		System.out.println("Generating " + (runCount * threadCount) + " genome sequences with thread pool completed in "
 				+ endTime + " nanoseconds. " + (endTime / 1000000) + " (milliseconds)");
 	}
 }
